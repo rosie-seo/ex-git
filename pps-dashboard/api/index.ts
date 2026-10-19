@@ -1,1 +1,1 @@
-export {default} from '../server/vercel-handler.ts';
+export {default} from '../server/vercel-handler.js';

@@ -1,5 +1,5 @@
-import { upsertReport } from "./reports.ts";
-import type { Store } from "./store.ts";
+import { upsertReport } from "./reports.js";
+import type { Store } from "./store.js";
 export const defaultSource = "";
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function notion(path: string, body?: object) {

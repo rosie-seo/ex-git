@@ -14,8 +14,8 @@ import {
   storageConfigured,
   uploadFile,
   downloadFile,
-} from "./supabase.ts";
-import { extractPDF } from "./pdf.ts";
+} from "./supabase.js";
+import { extractPDF } from "./pdf.js";
 import {
   dashboard,
   candidates,
@@ -26,9 +26,9 @@ import {
   type Activity,
   type Progress,
   type Baseline,
-} from "./model.ts";
-import { upsertReport, hash } from "./reports.ts";
-import { syncNotion } from "./notion.ts";
+} from "./model.js";
+import { upsertReport, hash } from "./reports.js";
+import { syncNotion } from "./notion.js";
 const root = resolve(import.meta.dirname, ".."),
   app = express();
 app.disable("x-powered-by");
