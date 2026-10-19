@@ -524,6 +524,7 @@ app.get("/source/:file", async (req, res) => {
       });
   }
 });
+app.use(["/api", "/source"], (_req,res)=>{res.status(404).json({error:"API 경로를 찾을 수 없습니다."})});
 app.use(express.static(join(root, "dist"), { index: false }));
 app.get("/", (req, res) => {
   const f = join(root, "dist/index.html");

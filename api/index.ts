@@ -1,2 +1,1 @@
-import {app} from '../pps-dashboard/server/index.ts';
-export default app;
+export {default} from '../pps-dashboard/server/vercel-handler.ts';

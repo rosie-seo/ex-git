@@ -10,14 +10,14 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api"
+      "destination": "/api/index?__pps_path=/api/:path*"
     },
     {
       "source": "/source/:path*",
-      "destination": "/api"
+      "destination": "/api/index?__pps_path=/source/:path*"
     },
     {
-      "source": "/((?!assets/|fonts/).*)",
+      "source": "/((?!api(?:/|$)|source(?:/|$)|assets/|fonts/).*)",
       "destination": "/index.html"
     }
   ],
