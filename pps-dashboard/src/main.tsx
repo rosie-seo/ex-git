@@ -25,7 +25,7 @@ async function api(path: string, method = "GET", body?: unknown) {
   try {
     data = await r.json();
   } catch {
-    throw Error("서버 응답을 읽을 수 없습니다");
+    throw Error(`API 응답 형식 오류 (HTTP ${r.status}). API 배포 경로와 Vercel 함수 로그를 확인하세요.`);
   }
   if (!r.ok) throw Error(data.error || "요청 실패");
   return data;

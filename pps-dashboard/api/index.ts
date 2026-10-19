@@ -1,2 +1,1 @@
-import { app } from "../server/index.ts";
-export default app;
+export {default} from '../server/vercel-handler.ts';
