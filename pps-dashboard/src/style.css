@@ -1377,3 +1377,43 @@ footer {
     gap: 10px;
   }
 }
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 20px;
+  border: 1px solid #c9dfd1;
+  background: #edf7f0;
+  border-radius: 9px;
+  margin-bottom: 25px;
+  color: #3e7453;
+}
+.demo-banner b {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.demo-banner span {
+  display: block;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.demo-banner .button {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.login-card > a.button {
+  margin: 16px 0;
+  width: 100%;
+}
+@media (max-width: 800px) {
+  .demo-banner {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 15px;
+  }
+  .demo-banner span {
+    font-size: 10px;
+  }
+}

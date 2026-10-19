@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "pretendard/dist/web/variable/pretendardvariable.css";
 import "./style.css";
+import { demoRequest, isDemoMode, demoNotice } from "./demo";
 import type { Task, Report, Activity, Progress } from "../server/model";
 type State = {
   tasks: Task[];
@@ -16,6 +17,7 @@ type State = {
   today: string;
 };
 async function api(path: string, method = "GET", body?: unknown) {
+  if (isDemoMode()) return demoRequest(path, method);
   const r = await fetch("/api" + path, {
     method,
     headers: body ? { "Content-Type": "application/json" } : {},
@@ -25,7 +27,9 @@ async function api(path: string, method = "GET", body?: unknown) {
   try {
     data = await r.json();
   } catch {
-    throw Error(`API 응답 형식 오류 (HTTP ${r.status}). API 배포 경로와 Vercel 함수 로그를 확인하세요.`);
+    throw Error(
+      `API 응답 형식 오류 (HTTP ${r.status}). API 배포 경로와 Vercel 함수 로그를 확인하세요.`,
+    );
   }
   if (!r.ok) throw Error(data.error || "요청 실패");
   return data;
@@ -88,7 +92,12 @@ function App() {
     if (session?.authenticated) reload().catch((e) => setError(e.message));
   }, [session, end]);
   useEffect(() => {
-    if (!session?.authenticated || state?.sync?.status !== "running") return;
+    if (
+      isDemoMode() ||
+      !session?.authenticated ||
+      state?.sync?.status !== "running"
+    )
+      return;
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
@@ -107,6 +116,10 @@ function App() {
     };
   }, [state?.sync, end, session?.authenticated]);
   async function act(fn: () => Promise<any>, message = "저장했습니다") {
+    if (isDemoMode()) {
+      setNotice("데모는 조회 전용입니다. 실제 작업은 로그인 후 이용하세요.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -181,7 +194,19 @@ function App() {
     ["settings", "연결 및 설정"],
   ];
   return (
-    <div className="app">
+    <div
+      className="app"
+      onClickCapture={(e) => {
+        if (!isDemoMode()) return;
+        const a = (e.target as Element).closest?.("a");
+        const href = a?.getAttribute("href") || "";
+        if (href.startsWith("/source/") || href.startsWith("#demo")) {
+          e.preventDefault();
+          e.stopPropagation();
+          setNotice("가상 자료이므로 실제 원문과 PDF는 제공하지 않습니다.");
+        }
+      }}
+    >
       <aside className="sidebar">
         <a className="brand" href="/" aria-label="PPS 홈">
           <span className="brandmark">p</span>
@@ -214,20 +239,27 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <span className="dot" /> 데이터는 서버에 저장됩니다
+          <span className="dot" />{" "}
+          {isDemoMode()
+            ? "데모 · 변경사항 저장 안 함"
+            : "데이터는 서버에 저장됩니다"}
           <small>Asia/Seoul · 한국 표준시</small>
           <div className="user">
             <span className="avatar">관</span>
             <div>
-              <b>프로젝트 관리자</b>
-              <small>보호된 워크스페이스</small>
+              <b>{isDemoMode() ? "데모 방문자" : "프로젝트 관리자"}</b>
+              <small>
+                {isDemoMode() ? "가상 자료 둘러보기" : "보호된 워크스페이스"}
+              </small>
             </div>
             <button
-              title="로그아웃"
+              title={isDemoMode() ? "실제 데이터 로그인" : "로그아웃"}
               onClick={() =>
-                api("/logout", "POST").then(() =>
-                  setSession({ ...session, authenticated: false }),
-                )
+                isDemoMode()
+                  ? window.location.assign("/login")
+                  : api("/logout", "POST").then(() =>
+                      setSession({ ...session, authenticated: false }),
+                    )
               }
             >
               ↪
@@ -243,12 +275,24 @@ function App() {
           </div>
           <div className="header-right">
             <span className="private">
-              <Icon name="check" /> 로그인 보호
+              <Icon name="check" />{" "}
+              {isDemoMode() ? "데모 · 로그인 없이 보기" : "로그인 보호"}
             </span>
             <span className="avatar small">관</span>
           </div>
         </header>
         <main>
+          {isDemoMode() && (
+            <div className="demo-banner" role="status">
+              <div>
+                <b>로그인 없이 둘러보기</b>
+                <span>{demoNotice}</span>
+              </div>
+              <a className="button" href="/login">
+                실제 데이터 로그인 →
+              </a>
+            </div>
+          )}
           {error && (
             <div className="alert error" role="alert">
               {error}
@@ -275,12 +319,17 @@ function App() {
               </p>
             </div>
             <div className="actions">
-              <button onClick={() => window.location.assign("/api/export")}>
+              <button
+                disabled={isDemoMode()}
+                onClick={() => window.location.assign("/api/export")}
+              >
                 <Icon name="arrow" /> 데이터 내보내기
               </button>
               <button
                 className="primary"
-                disabled={busy || state.sync?.status === "running"}
+                disabled={
+                  isDemoMode() || busy || state.sync?.status === "running"
+                }
                 onClick={() =>
                   act(() => api("/sync", "POST"), "노션 동기화를 시작했습니다")
                 }
@@ -294,9 +343,11 @@ function App() {
           </div>
           <div className="source-line">
             <span className="source-pill">
-              {state.tasks.length || state.reports.length
-                ? "실제 데이터"
-                : "데이터 없음"}
+              {isDemoMode()
+                ? "데모 데이터"
+                : state.tasks.length || state.reports.length
+                  ? "실제 데이터"
+                  : "데이터 없음"}
             </span>{" "}
             WBS · 노션 {state.reports.length}개 보고{" "}
             {state.notionConfigured
@@ -576,7 +627,7 @@ function App() {
                     보존하며, 과거 버전과 연결 이력을 유지합니다.
                   </p>
                   <BaselineForm
-                    busy={busy}
+                    busy={busy || isDemoMode()}
                     onSubmit={(v) =>
                       act(
                         () => api("/baselines", "POST", v),
@@ -606,7 +657,7 @@ function App() {
                     연결하세요.
                   </p>
                   <AliasForm
-                    busy={busy}
+                    busy={busy || isDemoMode()}
                     onSubmit={(v) => act(() => api("/aliases", "POST", v))}
                   />
                   {state.aliases.map((a) => (
@@ -631,7 +682,14 @@ function App() {
                     href="/source/wbs-v1.7.pdf"
                     target="_blank"
                     aria-disabled={!state.documents.length}
-                    onClick={e=>{if(!state.documents.length){e.preventDefault();setError("원본 PDF가 없습니다. 비공개 자료 이관 또는 새 PDF 등록을 먼저 진행하세요.")}}}
+                    onClick={(e) => {
+                      if (!state.documents.length) {
+                        e.preventDefault();
+                        setError(
+                          "원본 PDF가 없습니다. 비공개 자료 이관 또는 새 PDF 등록을 먼저 진행하세요.",
+                        );
+                      }
+                    }}
                   >
                     원본 PDF 열기 ↗
                   </a>
@@ -641,7 +699,7 @@ function App() {
                       type="file"
                       accept="application/pdf"
                       hidden
-                      disabled={busy}
+                      disabled={busy || isDemoMode()}
                       onChange={(e) => {
                         const f = e.target.files?.[0];
                         if (!f) return;
@@ -674,7 +732,7 @@ function App() {
                 <ImportReview
                   data={newPDF}
                   tasks={state.tasks}
-                  busy={busy}
+                  busy={busy || isDemoMode()}
                   onSave={(tasks) =>
                     act(async () => {
                       await api("/import/tasks", "POST", { tasks });
@@ -752,7 +810,7 @@ function App() {
           {tab === "reports" && (
             <ReportsView
               state={state}
-              busy={busy}
+              busy={busy || isDemoMode()}
               onAction={act}
               onTask={setDetail}
             />
@@ -802,7 +860,7 @@ function App() {
                 <h2>수집 상태</h2>
                 <pre>{JSON.stringify(state.sync, null, 2)}</pre>
                 <button
-                  disabled={busy}
+                  disabled={busy || isDemoMode()}
                   onClick={() =>
                     act(
                       () => api("/snapshot/reimport", "POST"),
@@ -838,7 +896,7 @@ function App() {
           task={selected}
           state={state}
           end={end}
-          busy={busy}
+          busy={busy || isDemoMode()}
           onClose={() => setDetail(null)}
           onAction={act}
         />
@@ -913,12 +971,17 @@ function Login({ session, onLogin }: { session: any; onLogin: () => void }) {
                 {error}
               </p>
             )}
-            <button className="primary" disabled={busy}>
+            <button className="primary" disabled={busy || isDemoMode()}>
               {busy ? "확인 중…" : "워크스페이스 로그인 →"}
             </button>
           </form>
         )}
-        <small>접근 권한이 있는 관리자만 사용할 수 있습니다.</small>
+        <a className="button" href="/">
+          로그인 없이 데모 둘러보기
+        </a>
+        <small>
+          접근 권한이 있는 관리자만 실제 데이터를 사용할 수 있습니다.
+        </small>
       </section>
     </div>
   );
@@ -985,7 +1048,7 @@ function BaselineForm({
           onChange={(e) => setDate(e.target.value)}
         />
       </label>
-      <button disabled={busy} className="primary">
+      <button disabled={busy || isDemoMode()} className="primary">
         기준 버전 확정
       </button>
     </form>
@@ -1025,7 +1088,7 @@ function AliasForm({
           onChange={(e) => setTo(e.target.value)}
         />
       </label>
-      <button disabled={busy}>별칭 확정</button>
+      <button disabled={busy || isDemoMode()}>별칭 확정</button>
     </form>
   );
 }
@@ -1188,7 +1251,7 @@ function TaskPanel({
               />
               원본 막대와 일정을 확인했습니다
             </label>
-            <button className="primary" disabled={busy}>
+            <button className="primary" disabled={busy || isDemoMode()}>
               작업본 저장
             </button>
           </form>
@@ -1304,7 +1367,7 @@ function TaskPanel({
                 onChange={(e) => setNote(e.target.value)}
               />
             </label>
-            <button className="primary" disabled={busy}>
+            <button className="primary" disabled={busy || isDemoMode()}>
               진척률 확정
             </button>
           </form>
@@ -1432,7 +1495,7 @@ function ReportsView({
             key={r.id}
             report={r}
             state={state}
-            busy={busy}
+            busy={busy || isDemoMode()}
             onAction={onAction}
             onTask={onTask}
           />
@@ -1520,7 +1583,7 @@ function ReportDetail({
               onChange={(e) => setEnd(e.target.value)}
             />
           </label>
-          <button disabled={busy} className="primary">
+          <button disabled={busy || isDemoMode()} className="primary">
             기간 확인·저장
           </button>
         </form>
@@ -1544,7 +1607,7 @@ function ReportDetail({
           activity={a}
           report={r}
           state={state}
-          busy={busy}
+          busy={busy || isDemoMode()}
           onAction={onAction}
           onTask={onTask}
         />
