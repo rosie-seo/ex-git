@@ -14,10 +14,10 @@ React/TypeScript 화면, Vercel Node 서버 함수, Supabase PostgreSQL 및 **�
 ### 2. Vercel 연결
 
 1. Vercel → Add New → Project → 이 GitHub 저장소를 Import합니다.
-2. **배포할 브랜치:** `codex/pps-vercel-supabase` (main에 병합했다면 main)
-3. **Root Directory:** `pps-dashboard`
+2. **배포할 브랜치:** 운영 배포는 `main`, PR 검토용 Preview는 작업 브랜치
+3. **Root Directory:** 기본값 `./`를 사용해도 됩니다. 기존 프로젝트가 `pps-dashboard`로 설정되어 있어도 지원합니다.
 4. **Framework Preset:** Other, **Node.js:** 24.x
-5. **Build Command:** `npm run build`, **Output Directory:** `dist`
+5. **Build Command:** `npm run build`. Output Directory는 Root가 `./`이면 `pps-dashboard/dist`, Root가 `pps-dashboard`이면 `dist`입니다. 해당 `vercel.json`의 기본값을 사용하세요.
 6. 아래 환경변수를 등록하고 Deploy합니다. 빌드/라우팅/60초 함수 제한은 `vercel.json`에 포함되어 있습니다.
 
 | 환경변수 | 값 |
@@ -100,3 +100,7 @@ npm test
 - `scripts/import-private-data.ts`: 로컬 비공개 자료 이관 도구
 
 AI API·개별 직원 SSO·세부 업무 가중 완료 산정은 연결하지 않았습니다. 단일 관리자 인증을 사용합니다.
+
+## 운영 주소에서 404가 날 때
+
+PR Preview 성공과 운영 도메인 배포는 별개입니다. Vercel Production Branch를 `main`으로 설정하고 앱 변경이 main에 반영되었는지 확인하세요. Root Directory 기본값 `./`와 `pps-dashboard`를 모두 지원합니다. 설정을 변경한 경우 main 최신 커밋으로 Redeploy해야 합니다.

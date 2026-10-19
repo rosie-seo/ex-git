@@ -1,0 +1,4 @@
+{
+  "extends": "./pps-dashboard/tsconfig.json",
+  "include": ["api", "pps-dashboard/server"]
+}

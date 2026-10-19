@@ -1,9 +1,9 @@
 name: PPS dashboard
 on:
   push:
-    paths: ['pps-dashboard/**', '.github/workflows/pps-dashboard.yml']
+    paths: ['pps-dashboard/**', 'api/**', 'package.json', 'package-lock.json', 'vercel.json', 'tsconfig.json', '.github/workflows/pps-dashboard.yml']
   pull_request:
-    paths: ['pps-dashboard/**', '.github/workflows/pps-dashboard.yml']
+    paths: ['pps-dashboard/**', 'api/**', 'package.json', 'package-lock.json', 'vercel.json', 'tsconfig.json', '.github/workflows/pps-dashboard.yml']
 permissions:
   contents: read
 jobs:
@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: pps-dashboard
+        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: pps-dashboard/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run build
       - run: npm test

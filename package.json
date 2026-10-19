@@ -1,0 +1,11 @@
+{
+  "name": "pps-dashboard-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": ["pps-dashboard"],
+  "engines": {"node": "24.x"},
+  "scripts": {
+    "build": "npm run build --workspace=pps-weekly-dashboard",
+    "test": "npm test --workspace=pps-weekly-dashboard"
+  }
+}
