@@ -46,3 +46,10 @@ wp-config.php
 # Note: If you wish to whitelist themes,
 # uncomment the next line
 #/wp-content/themes
+
+# Node workspace and local secrets
+node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
