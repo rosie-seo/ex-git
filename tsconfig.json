@@ -1,0 +1,13 @@
+{
+  "extends": "./pps-dashboard/tsconfig.json",
+  "include": [
+    "api",
+    "pps-dashboard/server"
+  ],
+  "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types",
+      "./pps-dashboard/node_modules/@types"
+    ]
+  }
+}
