@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vercel/
+.env
+.env.*
+!.env.example
+data/
+private-data/
+seed-wbs.json
+seed-notion.json
+assets/
+*.sqlite*
+*.pdf
+__pycache__/
