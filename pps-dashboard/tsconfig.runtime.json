@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rootDir": ".",
+    "outDir": ".runtime-check",
+    "declaration": false
+  },
+  "include": ["api", "server"],
+  "exclude": ["tests", "src", "scripts", "node_modules", ".runtime-check"]
+}

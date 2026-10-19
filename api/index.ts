@@ -1,1 +1,1 @@
-export {default} from '../pps-dashboard/server/vercel-handler.ts';
+export {default} from '../pps-dashboard/server/vercel-handler.js';

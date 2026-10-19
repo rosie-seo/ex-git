@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
-import type { Store } from "./store.ts";
+import type { Store } from "./store.js";
 import {
   splitActivities,
   suggestPeriod,
   type Report,
   type Activity,
-} from "./model.ts";
+} from "./model.js";
 export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 export function upsertReport(
   db: Store,

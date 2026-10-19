@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { RequestHandler } from "express";
-import { Store, type Records } from "./store.ts";
+import { Store, type Records } from "./store.js";
 export const context = new AsyncLocalStorage<Store>();
 export const db = new Proxy({} as Store, {
   get(_target, key) {

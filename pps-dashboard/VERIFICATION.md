@@ -17,3 +17,5 @@ Supabase 실제 프로젝트 마이그레이션 적용, Vercel 배포/라우팅 
 실제 업무 데이터는 저장소 밖에서 보관하고 `scripts/import-private-data.ts`로 비공개 Supabase에 이관합니다. 공개 저장소/프런트엔드 번들에 회사 원문이나 서버 비밀 키를 넣지 않습니다.
 
 API 라우팅 수정: Vercel 함수 목적지를 `/api/index`로 명시하고 원래 경로를 별도 파라미터로 전달·복원합니다. 모의 rewrite 요청에서 세션/파일/잘못된 API가 HTML 대신 JSON을 반환하는 회귀 검사 2개를 추가했습니다. 실제 배포 URL 직접 응답은 실행 환경의 네트워크 제한으로 미검증입니다.
+
+모듈 로딩 수정: 서버 상대 import를 실행 시점의 `.js` 경로로 통일했습니다. Vercel 공식 @vercel/node 24.0.3 빌더의 출력(228파일)을 Node 24에서 직접 실행하여 세션 JSON HTTP 200을 확인했습니다. 또한 `npm test`에 TypeScript로 서버 JavaScript를 생성한 후 tsx 없이 실행하는 회귀 검사를 추가했습니다. 이 로컬 재현과 실제 운영 사이트 접속 검증은 구분합니다.

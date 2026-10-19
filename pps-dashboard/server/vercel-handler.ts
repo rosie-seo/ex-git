@@ -21,6 +21,6 @@ export function restoreRoute(req:RoutedRequest) {
 }
 export default async function handler(req:RoutedRequest,res:ServerResponse){
  try{restoreRoute(req)}catch{res.statusCode=400;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({error:'잘못된 API 경로입니다.'}));return}
- try{const {app}=await import('./index.ts');app(req,res)}
+ try{const {app}=await import('./index.js');app(req,res)}
  catch(e){console.error('API bootstrap failure:',(e as Error).name);res.statusCode=500;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({error:'서버 초기화에 실패했습니다. Vercel 함수 로그와 Node 버전을 확인하세요.'}))}
 }

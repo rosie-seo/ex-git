@@ -7,8 +7,9 @@
     "dev": "node --env-file-if-exists=.env --import tsx server/index.ts",
     "build": "tsc --noEmit && vite build",
     "start": "node --env-file-if-exists=.env --import tsx server/index.ts",
-    "test": "node --import tsx --test tests/*.test.ts",
-    "import:private": "node --env-file-if-exists=.env --import tsx scripts/import-private-data.ts"
+    "test": "node --import tsx --test tests/*.test.ts && npm run test:runtime",
+    "import:private": "node --env-file-if-exists=.env --import tsx scripts/import-private-data.ts",
+    "test:runtime": "node scripts/check-function-runtime.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",
